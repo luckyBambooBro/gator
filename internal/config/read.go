@@ -9,16 +9,19 @@ import (
 const configFileNameBase string = ".gatorconfig.json"
 
 func Read() (*Config, error) {
-	fileName, err := getConfigFilePath()
+	filePath, err := getConfigFilePath()
 	if err != nil {
 		return nil, err
 	}
-	data, err := os.ReadFile(fileName)
-	if err != nil {
-		return nil, err
-	}
-	cfg := &Config{}
 
+	//read .gatorconfig.json
+	data, err := os.ReadFile(filePath)
+	if err != nil {
+		return nil, err
+	}
+
+	//unmarshal and return .gatorconfig.json
+	cfg := &Config{}
 	if err = json.Unmarshal(data, cfg); err != nil {
 		return nil, err
 	}
