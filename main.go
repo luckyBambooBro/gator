@@ -11,7 +11,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error reading file: %v", err)
 	}
-	err = cfg.SetUser("User1")
+	fmt.Printf("Read config: %+v\n", cfg)
+	err = cfg.SetUser("User12333")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -20,5 +21,5 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error reading file: %v", err)
 	}
-	fmt.Print(*cfg)
+	fmt.Printf("Read config: %+v\n", cfg)
 }

@@ -45,27 +45,26 @@ func getConfigFilePath() (string, error) {
 
 func (cfg *Config) SetUser(username string) error {
 	cfg.CurrentUserName = username
-	//convert cfg into slice of bytes to be written to file
-	data, err := write(cfg)
-	if err != nil {
-		return err
-	}
-	filepath, err := getConfigFilePath() //obtain filepath of .gatorconfig.json
-	if err != nil {
-		return err
-	}
-	os.Create(filepath)
-	//write to file (overwrite .gatorconfig.json with new data)
-	os.WriteFile(filepath, data, 0644)
-	return nil
-
+	return write(*cfg)
 }
 
-func write(cfg *Config) ([]byte, error){
-	
-	data, err := json.Marshal(cfg)
+func write(cfg Config) error {
+	//get file path of .gatorconfig.json
+	filePath, err := getConfigFilePath()
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return data, nil
+	//create. os.File typw which satisfies os.writer interface
+	file, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	//creates encoder
+	encoder := json.NewEncoder(file)
+	err = encoder.Encode(cfg)
+	if err != nil {
+		return err
+	}
+	return nil
 }
