@@ -1,5 +1,11 @@
 package config
 
+
+import (
+	"errors"
+	"fmt"
+)
+
 type state struct {
 	currentState *Config
 }
@@ -10,5 +16,29 @@ type command struct {
 }
 
 func handlerLogin(s *state, cmd command) error {
-	
+	if len(cmd.arguments) == 0 {
+		return errors.New("username not provided")
+	}
+	s.currentState.SetUser(cmd.arguments[0])
+	fmt.Printf("username set to %s\n", cmd.arguments[0])
+	return nil
+}
+
+type commands struct {
+	handler map[string]func(*state, command) error
+}
+
+func (c *commands) run(s *state, cmd command) error {
+	if _, ok := c.handler[cmd.name]; !ok {
+		return fmt.Errorf("%s command does not exist", cmd.name)
+	}
+	return c.handler[cmd.name](s, cmd)
+}
+
+func (c *commands) register (name string, f func(*state, command) error) {
+	// This method registers a new handler function for a command name.
+	if c.handler == nil {
+		c.handler = make(map[string]func(*state, command) error)
+	}
+	c.handler[name] = f
 }
