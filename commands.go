@@ -1,13 +1,14 @@
-package config
-
+package main
 
 import (
 	"errors"
 	"fmt"
+
+	"github.com/luckyBambooBro/gator/internal/config"	
 )
 
 type state struct {
-	currentState *Config
+	currentState *config.Config
 }
 
 type command struct {
