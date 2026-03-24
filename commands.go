@@ -17,10 +17,12 @@ type command struct {
 }
 
 func handlerLogin(s *state, cmd command) error {
-	if len(cmd.arguments) == 0 {
+	if len(cmd.arguments) == 0 { //or should i have if len(cmd.arguments) != 1 ... (since we want just one argument for username?)
 		return errors.New("username not provided")
 	}
-	s.currentState.SetUser(cmd.arguments[0])
+	if err := s.currentState.SetUser(cmd.arguments[0]); err != nil {
+		return err
+	}
 	fmt.Printf("username set to %s\n", cmd.arguments[0])
 	return nil
 }

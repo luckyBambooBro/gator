@@ -17,7 +17,7 @@ func main() {
 	fmt.Printf("Read config: %+v\n", cfg)
 
 	//save read contents to state
-	s := state{
+	s := &state{
 		currentState: &cfg,
 	}
 
@@ -42,6 +42,7 @@ func main() {
 		arguments: args[2:],
 	}
 
+	cmds.run(s, cmd)
 }
 /*
 	err = cfg.SetUser("User12333")
