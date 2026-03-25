@@ -8,6 +8,10 @@ import (
 	"github.com/luckyBambooBro/gator/internal/config"
 )
 
+type state struct {
+	cfg *config.Config
+}
+
 func main() {
 	//first read of .gatorconfig.json
 	cfg, err := config.Read()
@@ -17,15 +21,15 @@ func main() {
 	fmt.Printf("Read config: %+v\n", cfg)
 
 	//save read contents to state
-	s := &state{
-		currentState: &cfg,
+	programState := &state{
+		cfg: &cfg,
 	}
 
 	//Create a new instance of the commands struct with 
 	// an initialized map of handler functions.
 
 	cmds := &commands{
-		handler: make(map[string]func(*state, command) error),
+		registeredCommands: make(map[string]func(*state, command) error),
 	}
 
 	//register functions here
@@ -39,12 +43,12 @@ func main() {
 	}
 	//create a command struct to hold the command name and its arguments
 	cmd := command{
-		name: args[1],
-		arguments: args[2:],
+		Name: args[1],
+		Args: args[2:],
 	}
 
 	//run the function the user has entered
-	if err = cmds.run(s, cmd); err != nil {
+	if err = cmds.run(programState, cmd); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
