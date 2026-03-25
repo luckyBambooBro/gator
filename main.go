@@ -27,22 +27,28 @@ func main() {
 	cmds := &commands{
 		handler: make(map[string]func(*state, command) error),
 	}
+
+	//register functions here
 	cmds.register("login", handlerLogin)
 
 	//obtain args passed in by user in CLI
 	args := os.Args
 	if len(args) < 2 {
-		fmt.Println("cli usage: \"gator command args...\". command not supplied")
+		fmt.Println("cli error: command/args not supplied")
 		os.Exit(1)
 	}
-
 	//create a command struct to hold the command name and its arguments
 	cmd := command{
 		name: args[1],
 		arguments: args[2:],
 	}
 
-	cmds.run(s, cmd)
+	//run the function the user has entered
+	if err = cmds.run(s, cmd); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
 }
 /*
 	err = cfg.SetUser("User12333")

@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"errors"
 	"os"
 	"path/filepath"
 )
@@ -44,6 +45,9 @@ func getConfigFilePath() (string, error) {
 
 
 func (cfg *Config) SetUser(username string) error {
+	if username == "" {
+		return errors.New("username not provided")
+	}
 	cfg.CurrentUserName = username
 	return write(*cfg)
 }
