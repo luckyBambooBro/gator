@@ -1,0 +1,22 @@
+# --- Binaries ---
+# Only ignore 'gator' in the root directory to avoid matching 
+# folders or files like 'internal/gator/logic.go'
+/gator
+/gator.exe
+
+# --- SQLite (If applicable) ---
+# If you ever test with local SQLite files in this folder
+*.db
+*.db-journal
+*.db-wal
+
+# --- System Junk ---
+# macOS creates these hidden files in folders you browse
+.DS_Store
+# Windows creates these for folder thumbnails
+Thumbs.db
+
+# --- IDEs ---
+# If you use VS Code or GoLand, ignore their internal settings
+.vscode/
+.idea/
