@@ -23,11 +23,12 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error reading file: %v", err)
 	}
-	//add dbURL here
+	//db returns a *sql.DB - this is the postgres connection to a database
 	db, err := sql.Open("postgres", cfg.DBURL)
 	if err != nil {
 		log.Fatalf("Error opening database: %v", err)
 	}
+	//database.New() takes a DBTX interface, *sql.DB fits this interface
 	dbQueries := database.New(db)
 
 	fmt.Printf("Read config: %+v\n", cfg)
