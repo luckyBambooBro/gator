@@ -1,14 +1,19 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"os"
 
 	"github.com/luckyBambooBro/gator/internal/config"
+	"github.com/luckyBambooBro/gator/internal/database"
+
+	_ "github.com/lib/pq"
 )
 
 type state struct {
+	db *database.Queries
 	cfg *config.Config
 }
 
@@ -18,14 +23,22 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error reading file: %v", err)
 	}
+	//add dbURL here
+	db, err := sql.Open("postgres", cfg.DBURL)
+	if err != nil {
+		log.Fatalf("Error opening database: %v", err)
+	}
+	dbQueries := database.New(db)
+
 	fmt.Printf("Read config: %+v\n", cfg)
 
 	//save read contents to state
 	programState := &state{
+		db: dbQueries,
 		cfg: &cfg,
 	}
 
-	//Create a new instance of the commands struct with 
+	//Create a new instance of the commands struct with
 	// an initialized map of handler functions.
 
 	cmds := &commands{
@@ -54,16 +67,3 @@ func main() {
 	}
 
 }
-/*
-	err = cfg.SetUser("User12333")
-	if err != nil {
-		log.Fatal(err)
-	}
-	//reread and print to terminal
-	cfg, err = config.Read()
-	if err != nil {
-		log.Fatalf("Error reading file: %v", err)
-	}
-	fmt.Printf("Read config: %+v\n", cfg)
-}
-*/
