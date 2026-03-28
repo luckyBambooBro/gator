@@ -2,8 +2,8 @@
 -- +goose Up
 CREATE TABLE users (
     id UUID PRIMARY KEY,
-    created_at timestamp (2) NOT NULL,
-    updated_at timestamp (2) NOT NULL,
+    created_at TIMESTAMPTZ  NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL,
     name TEXT NOT NULL
 );
 
