@@ -1,10 +1,14 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/luckyBambooBro/gator/internal/database"
+
+	"github.com/google/uuid"
 )
 
 func handlerLogin(s *state, cmd command) error {
@@ -20,6 +24,7 @@ func handlerLogin(s *state, cmd command) error {
 
 /*
 Ensure that a name was passed in the args.
+
 Create a new user in the database. It should have access to the CreateUser query through the state -> db struct.
 Pass context.Background() to the query to create an empty Context argument.
 Use the uuid.New() function to generate a new UUID for the user.
@@ -30,8 +35,18 @@ Set the current user in the config to the given name.
 Print a message that the user was created, and log the user's data to the console for your own debugging.
 */
 func handlerRegister(s *state,c command) error {
+	if len(c.Args) == 0 {
+				return errors.New("name not provided for register command")
+	} 
 	name := c.Args[0]
-	if name == "" {
-		return errors.New("name not provided for register command")
+
+	//create new user parameters
+	newUserParams := database.CreateUserParams{
+		ID: uuid.New(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Name: name,
 	}
+	s.db.CreateUser(context.Background(), newUserParams)
+	return nil
 }
