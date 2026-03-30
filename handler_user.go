@@ -16,7 +16,15 @@ func handlerLogin(s *state, cmd command) error {
 	if len(cmd.Args) != 1 { //or should i have if len(cmd.Args) != 1 ... (since we want just one argument for username?)
 		return fmt.Errorf("usage: <%s> username error. Please provide one username", cmd.Name)
 	}
-	if err := s.cfg.SetUser(cmd.Args[0]); err != nil {
+	name := cmd.Args[0]
+	//check the user exists (has been registered) in database before allowing login
+	if _, err := s.db.GetUser(context.Background(), name); err != nil {
+		fmt.Printf("username %q does not exist in database\n", name)
+		os.Exit(1)
+	}
+
+	//set the user 
+	if err := s.cfg.SetUser(name); err != nil {
 		return err
 	}
 	fmt.Println("username switched successfully")
@@ -35,7 +43,7 @@ Exit with code 1 if a user with that name already exists.
 Set the current user in the config to the given name.
 Print a message that the user was created, and log the user's data to the console for your own debugging.
 */
-func handlerRegister(s *state,c command) error {
+func handlerRegister(s *state, c command) error {
 	if len(c.Args) == 0 {
 				return errors.New("name not provided for register command")
 	} 
@@ -53,13 +61,13 @@ func handlerRegister(s *state,c command) error {
 	newUser, err := s.db.CreateUser(context.Background(), newUserParams)
 	if err != nil {
 		fmt.Println(err)
-		fmt.Printf("User with name \"%s\" already exists\n", name)
+		fmt.Printf("User with name %q already exists\n", name)
 		os.Exit(1)
 	}
 
 	//set user name in config
 	s.cfg.SetUser(newUser.Name)
-	fmt.Printf("User %+s successfully created", newUser.Name)
+	fmt.Printf("User %q successfully created", newUser.Name)
 	fmt.Println(newUser)
 
 	return nil

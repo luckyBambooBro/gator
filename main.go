@@ -29,7 +29,7 @@ func main() {
 		log.Fatalf("Error opening database: %v", err)
 	}
 	//database.New() takes a DBTX interface, *sql.DB fits this interface
-	//returns *database.Queries
+	//returns *database.Queries which has the methods for Go-SQL code
 	dbQueries := database.New(db)
 
 	fmt.Printf("Read config: %+v\n", cfg)
