@@ -29,6 +29,7 @@ func main() {
 		log.Fatalf("Error opening database: %v", err)
 	}
 	//database.New() takes a DBTX interface, *sql.DB fits this interface
+	//returns *database.Queries
 	dbQueries := database.New(db)
 
 	fmt.Printf("Read config: %+v\n", cfg)
@@ -48,6 +49,7 @@ func main() {
 
 	//register functions here
 	cmds.register("login", handlerLogin)
+	cmds.register("register", handlerRegister)
 
 	//obtain args passed in by user in CLI
 	args := os.Args

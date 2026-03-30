@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/luckyBambooBro/gator/internal/database"
@@ -47,6 +48,20 @@ func handlerRegister(s *state,c command) error {
 		UpdatedAt: time.Now(),
 		Name: name,
 	}
-	s.db.CreateUser(context.Background(), newUserParams)
+	
+	//create new user
+	newUser, err := s.db.CreateUser(context.Background(), newUserParams)
+	if err != nil {
+		fmt.Println(err)
+		fmt.Printf("User with name \"%s\" already exists\n", name)
+		os.Exit(1)
+	}
+
+	//set user name in config
+	s.cfg.SetUser(newUser.Name)
+	fmt.Printf("User %+s successfully created", newUser.Name)
+	fmt.Println(newUser)
+
 	return nil
+
 }
