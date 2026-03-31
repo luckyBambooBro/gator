@@ -50,6 +50,7 @@ func main() {
 	//register functions here
 	cmds.register("login", handlerLogin)
 	cmds.register("register", handlerRegister)
+	cmds.register("reset", handlerReset)
 
 	//obtain args passed in by user in CLI
 	args := os.Args

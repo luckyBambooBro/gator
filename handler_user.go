@@ -61,3 +61,11 @@ func handlerRegister(s *state, c command) error {
 	return nil
 
 }
+
+func handlerReset(s *state, c command) error {
+	if err := s.db.DeleteUsers(context.Background()); err != nil {
+		return err
+	}
+	fmt.Println("Successfully reset all users")
+	return nil
+}
