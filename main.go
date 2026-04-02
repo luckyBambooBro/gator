@@ -13,7 +13,7 @@ import (
 )
 
 type state struct {
-	db *database.Queries
+	db  *database.Queries
 	cfg *config.Config
 }
 
@@ -36,7 +36,7 @@ func main() {
 
 	//save read contents to state
 	programState := &state{
-		db: dbQueries,
+		db:  dbQueries,
 		cfg: &cfg,
 	}
 
@@ -51,6 +51,7 @@ func main() {
 	cmds.register("login", handlerLogin)
 	cmds.register("register", handlerRegister)
 	cmds.register("reset", handlerReset)
+	cmds.register("users", handlerListUsers)
 
 	//obtain args passed in by user in CLI
 	args := os.Args

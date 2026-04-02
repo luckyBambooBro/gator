@@ -23,7 +23,7 @@ func handlerLogin(s *state, cmd command) error {
 		os.Exit(1)
 	}
 
-	//set the user 
+	//set the user
 	if err := s.cfg.SetUser(name); err != nil {
 		return err
 	}
@@ -33,18 +33,18 @@ func handlerLogin(s *state, cmd command) error {
 
 func handlerRegister(s *state, c command) error {
 	if len(c.Args) == 0 {
-				return errors.New("name not provided for register command")
-	} 
+		return errors.New("name not provided for register command")
+	}
 	name := c.Args[0]
 
 	//create new user parameters
 	newUserParams := database.CreateUserParams{
-		ID: uuid.New(),
+		ID:        uuid.New(),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
-		Name: name,
+		Name:      name,
 	}
-	
+
 	//create new user
 	newUser, err := s.db.CreateUser(context.Background(), newUserParams)
 	if err != nil {
@@ -67,5 +67,23 @@ func handlerReset(s *state, c command) error {
 		return err
 	}
 	fmt.Println("Successfully reset all users")
+	return nil
+}
+
+func handlerListUsers(s *state, c command) error {
+	users, err := s.db.GetUsers(context.Background())
+	if err != nil {
+		return fmt.Errorf("error obtaining users: %w", err)
+
+	}
+
+	currentUser := s.cfg.CurrentUserName //up to here
+	for _, user := range users {
+		if user.Name == currentUser {
+			fmt.Println(user.Name, "(current)")
+			continue
+		}
+		fmt.Println(user.Name)
+	}
 	return nil
 }
