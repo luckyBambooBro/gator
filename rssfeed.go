@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"encoding/xml"
+	"io"
 	"net/http"
 	"time"
 )
@@ -23,14 +25,25 @@ type RSSItem struct {
 }
 
 func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
-	req, err := http.NewRequestWithContext(context.Background(), "GET", feedURL, nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", feedURL, nil)
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set()
+	req.Header.Set("User-Agent", "gator")
 	client := &http.Client{Timeout: 10 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
 		return  nil, err
 	}
+	defer resp.Body.Close()
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	//data is a []bytes that we need to unmarshal using xml.Unmarshal()
+	rss := &RSSFeed{}
+	if err = xml.Unmarshal(data, rss); err != nil {
+		return nil, err
+	}
+	return rss, nil
 }
