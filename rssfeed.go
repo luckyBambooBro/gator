@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"net/http"
+	"time"
 )
 
 type RSSFeed struct {
@@ -23,4 +24,13 @@ type RSSItem struct {
 
 func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 	req, err := http.NewRequestWithContext(context.Background(), "GET", feedURL, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set()
+	client := &http.Client{Timeout: 10 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return  nil, err
+	}
 }
