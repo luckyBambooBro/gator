@@ -87,3 +87,7 @@ func handlerListUsers(s *state, c command) error {
 	}
 	return nil
 }
+
+func handlerAgg(s *state, c command) error {
+	fetchFeed(context.Background(), "https://www.wagslane.dev/index.xml")
+}
