@@ -40,8 +40,8 @@ func handlerRegister(s *state, c command) error {
 	//create new user parameters
 	newUserParams := database.CreateUserParams{
 		ID:        uuid.New(),
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
 		Name:      name,
 	}
 
