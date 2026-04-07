@@ -58,20 +58,19 @@ func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 	if err = xml.Unmarshal(data, rss); err != nil {
 		return nil, err
 	}
-	return decodeEscapedHTML(rss), nil
-}
 
-/*Use the html.UnescapeString function to decode escaped HTML entities (like &ldquo;). You'll need to run the Title and 
+	/*Use the html.UnescapeString function to decode escaped HTML entities (like &ldquo;). You'll need to run the Title and 
 Description fields (of both the entire channel as well as the items) through this function.*/
 
-func decodeEscapedHTML(rss *RSSFeed) *RSSFeed {
 	rss.Channel.Title = html.UnescapeString(rss.Channel.Title)
 	rss.Channel.Description = html.UnescapeString(rss.Channel.Description)
 	for i := range rss.Channel.Item {
 		rss.Channel.Item[i].Title = html.UnescapeString(rss.Channel.Item[i].Title) 
 		rss.Channel.Item[i].Description = html.UnescapeString(rss.Channel.Item[i].Description)
 	}
-	return rss
+	return rss, nil
 }
+
+
 
 
