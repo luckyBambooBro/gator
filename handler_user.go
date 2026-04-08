@@ -55,7 +55,7 @@ func handlerRegister(s *state, c command) error {
 
 	//set user name in config
 	s.cfg.SetUser(newUser.Name)
-	fmt.Printf("User %q successfully created", newUser.Name)
+	fmt.Printf("User %q successfully created\n", newUser.Name)
 	fmt.Println(newUser)
 
 	return nil
