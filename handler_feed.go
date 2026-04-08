@@ -32,6 +32,10 @@ func handlerAddFeed(s *state, c command) error {
 	UserID:    currentUser.ID,
 	}
 
-	_, err = s.db.CreateFeed(context.Background(), feedParams)
+	feed, err := s.db.CreateFeed(context.Background(), feedParams)
+	if err != nil {
+		return fmt.Errorf("unable to create feed: %w", err)
+	}
+	fmt.Printf("Added feed:\n%v\n", feed)
 	return err
 }
