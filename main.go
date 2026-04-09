@@ -32,7 +32,8 @@ func main() {
 	//returns *database.Queries which has the methods for Go-SQL code
 	dbQueries := database.New(db)
 
-	fmt.Printf("Read config: %+v\n", cfg)
+	// the following line is useful to have, but it made me fail lesson ch3l3
+	// fmt.Printf("Read config: %+v\n", cfg)
 
 	//save read contents to state
 	programState := &state{
@@ -54,7 +55,7 @@ func main() {
 	cmds.register("users", handlerListUsers)
 	cmds.register("agg", handlerAgg)
 	cmds.register("addfeed", handlerAddFeed)
-	cmds.register("feeds", handlerFeeds)
+	cmds.register("feeds", handlerListFeeds)
 	//obtain args passed in by user in CLI
 	args := os.Args
 	if len(args) < 2 {
