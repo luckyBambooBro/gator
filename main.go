@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/luckyBambooBro/gator/internal/config"
 	"github.com/luckyBambooBro/gator/internal/database"
@@ -12,9 +13,12 @@ import (
 	_ "github.com/lib/pq"
 )
 
+const contextTimeout = 5 * time.Second
+
 type state struct {
 	db  *database.Queries
 	cfg *config.Config
+	timeout time.Duration
 }
 
 func main() {
@@ -39,6 +43,7 @@ func main() {
 	programState := &state{
 		db:  dbQueries,
 		cfg: &cfg,
+		timeout: contextTimeout,
 	}
 
 	//Create a new instance of the commands struct with
@@ -56,6 +61,7 @@ func main() {
 	cmds.register("agg", handlerAgg)
 	cmds.register("addfeed", handlerAddFeed)
 	cmds.register("feeds", handlerListFeeds)
+	cmds.register("follow", handlerFollow)
 	//obtain args passed in by user in CLI
 	args := os.Args
 	if len(args) < 2 {

@@ -22,7 +22,7 @@ func handlerAddFeed(s *state, c command) error {
 	}
 
 	//obtain current user
-	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), s.timeout)
 	defer cancel()
 	currentUser, err := s.db.GetUser(ctx, s.cfg.CurrentUserName)
 	if err != nil {
@@ -49,7 +49,7 @@ func handlerAddFeed(s *state, c command) error {
 
 func handlerListFeeds(s *state, c command) error {
 	//get feeds
-	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), s.timeout)
 	defer cancel()
 	feeds, err := s.db.GetFeeds(ctx)
 	if err != nil {

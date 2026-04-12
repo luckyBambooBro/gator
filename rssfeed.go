@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	timeout = 10 * time.Second
+	timeout = 5 * time.Second
 	userAgent = "gator"
 )
 

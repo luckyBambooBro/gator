@@ -18,7 +18,7 @@ func handlerLogin(s *state, cmd command) error {
 	}
 	name := cmd.Args[0]
 	//check the user exists (has been registered) in database before allowing login
-	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), s.timeout)
 	defer cancel()
 	if _, err := s.db.GetUser(ctx, name); err != nil {
 		fmt.Printf("username %q does not exist in database\n", name)
@@ -48,7 +48,7 @@ func handlerRegister(s *state, c command) error {
 	}
 
 	//create new user
-	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), s.timeout)
 	defer cancel()
 	newUser, err := s.db.CreateUser(ctx, newUserParams)
 	if err != nil {
@@ -67,7 +67,7 @@ func handlerRegister(s *state, c command) error {
 }
 
 func handlerReset(s *state, c command) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), s.timeout)
 	defer cancel()
 	if err := s.db.DeleteUsers(ctx); err != nil {
 		return err
@@ -77,7 +77,7 @@ func handlerReset(s *state, c command) error {
 }
 
 func handlerListUsers(s *state, c command) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), s.timeout)
 	defer cancel()
 	users, err := s.db.GetUsers(ctx)
 	if err != nil {
