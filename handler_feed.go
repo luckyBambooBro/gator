@@ -22,13 +22,15 @@ func handlerAddFeed(s *state, c command) error {
 	}
 
 	//obtain current user
-	currentUser, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
+	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+	defer cancel()
+	currentUser, err := s.db.GetUser(ctx, s.cfg.CurrentUserName)
 	if err != nil {
 		return fmt.Errorf("unable to retrieve user from users table: %w", err)
 	}
 
 	//add feed to feeds table of database
-	feed, err := s.db.CreateFeed(context.Background(), database.CreateFeedParams{
+	feed, err := s.db.CreateFeed(ctx, database.CreateFeedParams{
 		ID:        uuid.New(),
 		CreatedAt: time.Now().UTC(),
 		UpdatedAt: time.Now().UTC(),
@@ -47,7 +49,9 @@ func handlerAddFeed(s *state, c command) error {
 
 func handlerListFeeds(s *state, c command) error {
 	//get feeds
-	feeds, err := s.db.GetFeeds(context.Background())
+	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+	defer cancel()
+	feeds, err := s.db.GetFeeds(ctx)
 	if err != nil {
 		return fmt.Errorf("Unable to obtain feeds from table: %w", err)
 	}

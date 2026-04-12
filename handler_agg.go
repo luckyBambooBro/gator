@@ -3,10 +3,13 @@ package main
 import (
 	"fmt"
 	"context"
+	"time"
 )
 
 func handlerAgg(s *state, c command) error {
-	feed, err := fetchFeed(context.Background(), "https://www.wagslane.dev/index.xml")
+	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+	defer cancel()
+	feed, err := fetchFeed(ctx, "https://www.wagslane.dev/index.xml")
 	if err != nil {
 		return fmt.Errorf("could not fetch feed: %w", err)
 	}
