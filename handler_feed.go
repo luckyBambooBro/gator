@@ -11,7 +11,7 @@ import (
 
 func handlerAddFeed(s *state, c command) error {
 	if len(c.Args) != 2 {
-		return fmt.Errorf("not enough arguments provided for \"add\" command")
+		return fmt.Errorf("please provide name of feed and feel URL")
 	}
 	name := c.Args[0]
 	url := c.Args[1]
