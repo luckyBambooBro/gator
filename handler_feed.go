@@ -11,7 +11,7 @@ import (
 
 func handlerAddFeed(s *state, c command) error {
 	if len(c.Args) != 2 {
-		return fmt.Errorf("please provide name of feed and feel URL")
+		return fmt.Errorf("please provide name of feed followed by feed URL")
 	}
 	name := c.Args[0]
 	url := c.Args[1]
@@ -63,6 +63,41 @@ func handlerListFeeds(s *state, c command) error {
 		fmt.Println(feed.Url)
 		fmt.Println(feed.NameFromUsers)
 		fmt.Println()
+	}
+	return nil
+}
+
+func handlerFollowing (s *state, c command) error {
+	if len(c.Args) != 0 {
+		return fmt.Errorf("no arguments required for 'following' command")
+	}
+	//get details of current user
+	ctx, cancel := context.WithTimeout(context.Background(), s.timeout)
+	defer cancel()
+	userName := s.cfg.CurrentUserName
+	userDetails, err := s.db.GetUser(ctx, userName)
+	if err != nil {
+		return fmt.Errorf("error obtaining user details: %w", err)
+	}
+	userID := userDetails.ID
+
+	//obtain slice of feedFollows for current user
+	feedFollows, err := s.db.GetFeedFollowsForUser(ctx, userID)
+	if err != nil {
+		return fmt.Errorf("unable to obtain feedFollows for %s", userName)
+	}
+
+	//print name of user and feedFollows for user 
+	fmt.Printf("Printing feed follows for %s...\n", userName)
+	for _, feedFollow := range feedFollows {
+		//obtain the feed using details of feedFollow many to many chart
+		feedID := feedFollow.ID
+		feed, err := s.db.GetFeedByID(ctx, feedID)
+		if err != nil {
+			return fmt.Errorf("error obtaining feed: %w", err)
+		}
+		//print feed name
+		fmt.Println(feed.Name)
 	}
 	return nil
 }

@@ -20,3 +20,6 @@ ON feeds.user_id = users.id;
 SELECT * FROM feeds
 WHERE url = $1;
 
+-- name: GetFeedByID :one
+SELECT * FROM feeds
+WHERE id = $1;
