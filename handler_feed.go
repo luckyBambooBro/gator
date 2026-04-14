@@ -86,6 +86,11 @@ func handlerFollowing (s *state, c command) error {
 	if err != nil {
 		return fmt.Errorf("unable to obtain feedFollows for %s", userName)
 	}
+	//return early if no feeds followed
+	if len(feedFollows) == 0 {
+		fmt.Printf("No feeds followed for user: %s", userName)
+		return nil
+	}
 
 	//print name of user and feedFollows for user 
 	fmt.Printf("Printing feed follows for %s...\n", userName)
