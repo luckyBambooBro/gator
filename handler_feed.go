@@ -81,28 +81,22 @@ func handlerFollowing (s *state, c command) error {
 	}
 	userID := userDetails.ID
 
-	//obtain slice of feedFollows for current user
-	feedFollows, err := s.db.GetFeedFollowsForUser(ctx, userID)
+	//obtain feeds followed by user
+	feedsFollowed, err := s.db.GetFeedFollowsForUser(ctx, userID)
 	if err != nil {
-		return fmt.Errorf("unable to obtain feedFollows for %s", userName)
+		return fmt.Errorf("error obtaining feeds for user: %s", userName)
 	}
-	//return early if no feeds followed
-	if len(feedFollows) == 0 {
-		fmt.Printf("No feeds followed for user: %s", userName)
+
+	if len(feedsFollowed) == 0 {
+		fmt.Printf("no feeds followed by user: %s", userName)
 		return nil
 	}
 
-	//print name of user and feedFollows for user 
-	fmt.Printf("Printing feed follows for %s...\n", userName)
-	for _, feedFollow := range feedFollows {
-		//obtain the feed using details of feedFollow many to many chart
-		feedID := feedFollow.ID
-		feed, err := s.db.GetFeedByID(ctx, feedID)
-		if err != nil {
-			return fmt.Errorf("error obtaining feed: %w", err)
-		}
-		//print feed name
-		fmt.Println(feed.Name)
+	//print feeds followed
+	fmt.Printf("Printing feeds for %s...", userName)
+	for _, feedFollowed := range feedsFollowed {
+		//up to here
 	}
-	return nil
+
+
 }
