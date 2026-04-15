@@ -2,10 +2,12 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/lib/pq"
 	"github.com/luckyBambooBro/gator/internal/database"
 )
 
@@ -38,10 +40,26 @@ func handlerAddFeed(s *state, c command) error {
 		Url:       url,
 		UserID:    currentUser.ID,
 	})
-
 	if err != nil {
+		var pqErr *pq.Error
+		if errors.As(err, &pqErr) {
+			if pqErr.Code == "23505" {
+				return fmt.Errorf("this feed already exists in the database")
+			}
+		}
 		return fmt.Errorf("unable to create feed: %w", err)
 	}
+
+	//automatically create a feedFollow for the user for the feed we just created
+	s.db.CreateFeedFollow(ctx, database.CreateFeedFollowParams{
+		ID: uuid.New(),
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
+		UserID: currentUser.ID,
+		FeedID: feed.ID,
+	})
+
+	//print 
 	fmt.Printf("Feed added successfully:\n%v\n", feed)
 	fmt.Println("=====================================")
 	return err
@@ -67,36 +85,3 @@ func handlerListFeeds(s *state, c command) error {
 	return nil
 }
 
-func handlerFollowing (s *state, c command) error {
-	if len(c.Args) != 0 {
-		return fmt.Errorf("no arguments required for 'following' command")
-	}
-	//get details of current user
-	ctx, cancel := context.WithTimeout(context.Background(), s.timeout)
-	defer cancel()
-	userName := s.cfg.CurrentUserName
-	userDetails, err := s.db.GetUser(ctx, userName)
-	if err != nil {
-		return fmt.Errorf("error obtaining user details: %w", err)
-	}
-	userID := userDetails.ID
-
-	//obtain feeds followed by user
-	feedsFollowed, err := s.db.GetFeedFollowsForUser(ctx, userID)
-	if err != nil {
-		return fmt.Errorf("error obtaining feeds for user: %s", userName)
-	}
-
-	if len(feedsFollowed) == 0 {
-		fmt.Printf("no feeds followed by user: %s", userName)
-		return nil
-	}
-
-	//print feeds followed
-	fmt.Printf("Printing feeds for %s...", userName)
-	for _, feedFollowed := range feedsFollowed {
-		//up to here
-	}
-
-
-}
