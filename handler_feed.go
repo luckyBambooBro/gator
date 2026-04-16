@@ -11,25 +11,16 @@ import (
 	"github.com/luckyBambooBro/gator/internal/database"
 )
 
-func handlerAddFeed(s *state, c command) error {
+func handlerAddFeed(s *state, c command, u database.User) error {
 	if len(c.Args) != 2 {
 		return fmt.Errorf("please provide name of feed followed by feed URL")
 	}
 	name := c.Args[0]
 	url := c.Args[1]
 
-	//check there is a user logged in
-	if s.cfg.CurrentUserName == "" {
-		return fmt.Errorf("you must be logged in to \"add\" feeds")
-	}
-
-	//obtain current user
 	ctx, cancel := context.WithTimeout(context.Background(), s.timeout)
 	defer cancel()
-	currentUser, err := s.db.GetUser(ctx, s.cfg.CurrentUserName)
-	if err != nil {
-		return fmt.Errorf("unable to retrieve user from users table: %w", err)
-	}
+
 
 	//add feed to feeds table of database
 	feed, err := s.db.CreateFeed(ctx, database.CreateFeedParams{
@@ -38,7 +29,7 @@ func handlerAddFeed(s *state, c command) error {
 		UpdatedAt: time.Now().UTC(),
 		Name:      name,
 		Url:       url,
-		UserID:    currentUser.ID,
+		UserID:    u.ID,
 	})
 	if err != nil {
 		var pqErr *pq.Error
@@ -49,18 +40,20 @@ func handlerAddFeed(s *state, c command) error {
 		}
 		return fmt.Errorf("unable to create feed: %w", err)
 	}
+	fmt.Printf("Feed created successfully: %q\n", url)
 
 	//automatically create a feedFollow for the user for the feed we just created
-	s.db.CreateFeedFollow(ctx, database.CreateFeedFollowParams{
+	_, err = s.db.CreateFeedFollow(ctx, database.CreateFeedFollowParams{
 		ID: uuid.New(),
 		CreatedAt: time.Now().UTC(),
 		UpdatedAt: time.Now().UTC(),
-		UserID: currentUser.ID,
+		UserID: u.ID,
 		FeedID: feed.ID,
 	})
+	if err != nil {
+		return fmt.Errorf("")
+	}
 
-	fmt.Printf("Feed created successfully: %q\n", url)
-	//print 
 	fmt.Printf("Feed added successfully:\n%v\n", feed)
 	fmt.Println("=====================================")
 	return err

@@ -12,7 +12,7 @@ import (
 	"github.com/luckyBambooBro/gator/internal/database"
 )
 
-func handlerFollow(s *state, c command) error {
+func handlerFollow(s *state, c command, u database.User) error {
 	if len(c.Args) != 1 {
 		return fmt.Errorf("please provide one URL for follow command")
 	}
@@ -31,18 +31,12 @@ func handlerFollow(s *state, c command) error {
 		
 	}
 
-	//obtain user details
-	user, err := s.db.GetUser(ctx, s.cfg.CurrentUserName)
-	if err != nil {
-		return err
-	}
-
 	//create the feed
 	feedFollowRecord, err := s.db.CreateFeedFollow(ctx, database.CreateFeedFollowParams{
 		ID: uuid.New(),
 		CreatedAt: time.Now().UTC(),
 		UpdatedAt: time.Now().UTC(),
-		UserID: user.ID,
+		UserID: u.ID,
 		FeedID: feed.ID,
 	})
 	//the following error check was advice i learnt from gemini. itll give a more 
@@ -64,33 +58,26 @@ func handlerFollow(s *state, c command) error {
 }
 
 //prints all the feeds being followed by the current user
-func handlerFollowing (s *state, c command) error {
+func handlerFollowing (s *state, c command, u database.User) error {
 	if len(c.Args) != 0 {
 		return fmt.Errorf("no arguments required for 'following' command")
 	}
-	//get details of current user
+	
 	ctx, cancel := context.WithTimeout(context.Background(), s.timeout)
 	defer cancel()
-	userName := s.cfg.CurrentUserName
-	userDetails, err := s.db.GetUser(ctx, userName)
-	if err != nil {
-		return fmt.Errorf("error obtaining user details: %w", err)
-	}
-	userID := userDetails.ID
-
 	//obtain feeds followed by user
-	feedsFollowed, err := s.db.GetFeedFollowsForUser(ctx, userID)
+	feedsFollowed, err := s.db.GetFeedFollowsForUser(ctx, u.ID)
 	if err != nil {
-		return fmt.Errorf("error obtaining feeds for user: %s\n", userName)
+		return fmt.Errorf("error obtaining feeds for user: %s\n", u.Name)
 	}
 
 	if len(feedsFollowed) == 0 {
-		fmt.Printf("no feeds followed by user: %s\n", userName)
+		fmt.Printf("no feeds followed by user: %s\n", u.Name)
 		return nil
 	}
 
 	//print feeds followed
-	fmt.Printf("Printing feeds for %s...\n", userName)
+	fmt.Printf("Printing feeds for %s...\n", u.Name)
 	for _, feedFollowed := range feedsFollowed {
 		fmt.Println("- ", feedFollowed.FeedName)
 	}
