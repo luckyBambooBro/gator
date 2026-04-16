@@ -59,6 +59,7 @@ func handlerAddFeed(s *state, c command) error {
 		FeedID: feed.ID,
 	})
 
+	fmt.Printf("Feed created successfully: %q\n", url)
 	//print 
 	fmt.Printf("Feed added successfully:\n%v\n", feed)
 	fmt.Println("=====================================")
