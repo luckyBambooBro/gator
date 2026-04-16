@@ -8,11 +8,11 @@ import (
 )
 
 func middlewareLoggedIn(handler func(s *state, cmd command, user database.User) error) func(*state, command) error {
-	return func(innerS *state, innserC command) error {
+	return func(s *state, cmd command) error {
 		// get current user
-		ctx, cancel := context.WithTimeout(context.Background(), innerS.timeout)
+		ctx, cancel := context.WithTimeout(context.Background(), s.timeout)
 		defer cancel()
-		currentUser, err := innerS.db.GetUser(ctx, innerS.cfg.CurrentUserName)
+		currentUser, err := s.db.GetUser(ctx, s.cfg.CurrentUserName)
 		if err != nil {
 			return fmt.Errorf("unable to obtain current user: %w", err)
 		}
