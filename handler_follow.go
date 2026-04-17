@@ -84,3 +84,28 @@ func handlerListFeedFollows (s *state, c command, u database.User) error {
 	return nil
 
 }
+
+func handlerUnfollowFeed(s *state, cmd command, u database.User) error {
+	if len(cmd.Args) != 1 {
+		return fmt.Errorf("please provide url for unfollow command")
+	}
+	//obtain feedID
+	feedURL := cmd.Args[0]
+	ctx, cancel := context.WithTimeout(context.Background(), s.timeout)
+	defer cancel()
+	feed, err := s.db.GetFeedByURL(ctx, feedURL)
+	if err != nil {
+		return fmt.Errorf("unable to obtain feed: %w", err)
+	}
+
+	//use unfollow command
+	err = s.db.UnfollowFeed(ctx, database.UnfollowFeedParams{
+		UserID: u.ID,
+		FeedID: feed.ID,
+	})
+	if err != nil {
+		return fmt.Errorf("unable to unfollow feed: %q. error: %w", feedURL, err)
+	}
+	fmt.Printf("Successfully unfollowed %q feed for user %q", feedURL, u.Name)
+	return nil
+}
