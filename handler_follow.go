@@ -87,7 +87,7 @@ func handlerListFeedFollows (s *state, c command, u database.User) error {
 
 func handlerUnfollowFeed(s *state, cmd command, u database.User) error {
 	if len(cmd.Args) != 1 {
-		return fmt.Errorf("please provide url for unfollow command")
+		return fmt.Errorf("usage: %s <feed_URL>", cmd.Name)
 	}
 	//obtain feedID
 	feedURL := cmd.Args[0]
@@ -99,7 +99,7 @@ func handlerUnfollowFeed(s *state, cmd command, u database.User) error {
 	}
 
 	//use unfollow command
-	err = s.db.UnfollowFeed(ctx, database.UnfollowFeedParams{
+	err = s.db.DeleteFeedFollow(ctx, database.DeleteFeedFollowParams{
 		UserID: u.ID,
 		FeedID: feed.ID,
 	})
