@@ -58,7 +58,7 @@ func handlerFollow(s *state, c command, u database.User) error {
 }
 
 //prints all the feeds being followed by the current user
-func handlerFollowing (s *state, c command, u database.User) error {
+func handlerListFeedFollows (s *state, c command, u database.User) error {
 	if len(c.Args) != 0 {
 		return fmt.Errorf("no arguments required for 'following' command")
 	}
