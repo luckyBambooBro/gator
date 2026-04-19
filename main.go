@@ -22,7 +22,7 @@ type state struct {
 }
 
 func main() {
-	//first read of .gatorconfig.json
+	//read of .gatorconfig.json
 	cfg, err := config.Read()
 	if err != nil {
 		log.Fatalf("Error reading file: %v", err)
