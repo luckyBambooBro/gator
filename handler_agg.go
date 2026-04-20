@@ -29,19 +29,19 @@ func handlerAgg(s *state, cmd command) error {
 	/*UP TO HERE: Use a time.Ticker to run your scrapeFeeds function once every time_between_reqs. I used a for loop 
 	to ensure that it runs immediately (I don't like waiting) and then every time the ticker ticks:*/
 
+	ticker := time.NewTicker(interval)
+	//doing it this way receives the ticker immediately instead of waiting for the first interval
+	for ; ; <-ticker.C {
+		err := scrapeFeeds(s)
+		if err != nil {
+			fmt.Printf("error scraping feed: %w", err)
+			continue
+		}
+		}
 
-	//fetch actual feed 
-	ctx, cancel := context.WithTimeout(context.Background(), s.timeout)
-	defer cancel()
-	feed, err := fetchFeed(ctx, "https://www.wagslane.dev/index.xml")
-	if err != nil {
-		return fmt.Errorf("could not fetch feed: %w", err)
-	}
-	fmt.Printf("Feed: %+v\n", feed)
-	return nil
 }
 
-func scrapeFeeds(s *state, cmd command) error {
+func scrapeFeeds(s *state) error {
 	//get next feed
 	ctx, cancel := context.WithTimeout(context.Background(), s.timeout)
 	defer cancel()
@@ -49,6 +49,7 @@ func scrapeFeeds(s *state, cmd command) error {
 	if err != nil {
 		return fmt.Errorf("error obtaining feed: %w", err)
 	}
+	fmt.Printf("Fetching feeds for: %s", feed.Name)
 
 	//mark feed as updated
 	err = s.db.MarkFeedFetched(ctx, database.MarkFeedFetchedParams{
@@ -63,5 +64,5 @@ func scrapeFeeds(s *state, cmd command) error {
 	for _, rssFeedItem := range rssFeed.Channel.Item {
 		fmt.Println(rssFeedItem.Title)
 	}
-
+	return nil
 }
