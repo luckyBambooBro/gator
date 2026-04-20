@@ -8,16 +8,24 @@ import (
 	"github.com/luckyBambooBro/gator/internal/database"
 )
 
+const requestLimit = 3 * time.Second
+
 func handlerAgg(s *state, cmd command) error {
 	//this function can only take one argument
 	if len(cmd.Args) != 1 {
-		return fmt.Errorf("usage: %s <'x's> (x = seconds)", cmd.Name)
+		return fmt.Errorf("usage: %s <duration>", cmd.Name)
 	}
 	
 	//this code block can easily be broken depending on what user types
-	selectedTimeBetweenReqs := cmd.Args[0]
-	timeBetweenReqs, err := time.ParseDuration(selectedTimeBetweenReqs)
-	fmt.Printf("Collecting feeds every %s\n", timeBetweenReqs)
+	interval, err := time.ParseDuration(cmd.Args[0]) //i just used cmd.Args[0] but the lesson wanted me to label it as 
+	//a variable called time_between_reqs. i dont think it matters?
+	if err != nil {
+		return fmt.Errorf("invaliud duration: %w", err)
+	}
+	if interval < requestLimit {
+		return fmt.Errorf("duration must be at least 1s to prevent server overload")
+	}
+	fmt.Printf("Collecting feeds every %s\n", interval)
 	/*UP TO HERE: Use a time.Ticker to run your scrapeFeeds function once every time_between_reqs. I used a for loop 
 	to ensure that it runs immediately (I don't like waiting) and then every time the ticker ticks:*/
 
