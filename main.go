@@ -13,7 +13,10 @@ import (
 	_ "github.com/lib/pq"
 )
 
-const contextTimeout = 5 * time.Second
+const (
+	contextTimeout = 5 * time.Second
+	logFile = "gator.log"
+)
 
 type state struct {
 	db  *database.Queries
@@ -22,15 +25,22 @@ type state struct {
 }
 
 func main() {
+	//set up logs
+	f, err := setupLogging()
+	if err == nil {
+		defer f.Close()
+	}
 	//read of .gatorconfig.json
 	cfg, err := config.Read()
 	if err != nil {
-		log.Fatalf("Error reading file: %v", err)
+		fmt.Printf("Error reading file: %v\n", err)
+		os.Exit(1)
 	}
 	//db returns a *sql.DB - this is the postgres connection to a database
 	db, err := sql.Open("postgres", cfg.DBURL)
 	if err != nil {
-		log.Fatalf("Error opening database: %v", err)
+		fmt.Printf("Error opening database: %v\n", err)
+		os.Exit(1)
 	}
 	//database.New() takes a DBTX interface, *sql.DB fits this interface
 	//returns *database.Queries which has the methods for Go-SQL code
@@ -82,4 +92,13 @@ func main() {
 		os.Exit(1)
 	}
 
+}
+
+func setupLogging() (*os.File, error) {
+	f, err := os.OpenFile(logFile, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.SetOutput(f)
+	return f, nil
 }

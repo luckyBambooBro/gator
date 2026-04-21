@@ -20,3 +20,6 @@ Thumbs.db
 # If you use VS Code or GoLand, ignore their internal settings
 .vscode/
 .idea/
+
+#--- logs ---
+gator.log

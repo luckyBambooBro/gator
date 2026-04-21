@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/luckyBambooBro/gator/internal/database"
@@ -32,28 +33,20 @@ func handlerAgg(s *state, cmd command) error {
 	ticker := time.NewTicker(interval)
 	//doing it this way receives the ticker immediately instead of waiting for the first interval
 	for ; ; <-ticker.C {
-		err := scrapeFeeds(s)
-		if err != nil {
-			fmt.Printf("error scraping feed: %v", err)
-			continue
+		scrapeFeeds(s)
 		}
-		}
+	}
 
-}
 
-func scrapeFeeds(s *state) error {
+func scrapeFeeds(s *state) {
 	//get next feed
 	ctx, cancel := context.WithTimeout(context.Background(), s.timeout)
 	defer cancel()
 	feed, err := s.db.GetNextFeedToFetch(ctx)
 	if err != nil {
-		return fmt.Errorf("error obtaining feed: %w", err)
+		log.Printf("error obtaining feed: %w", err)
 	}
-	err = scrapeFeed(s.db, feed, ctx)
-	if err != nil {
-		fmt.Printf("error scraping feed: %v", err)
-	}
-	return nil
+	scrapeFeed(s.db, feed, ctx)
 }
 
 func scrapeFeed(db *database.Queries, feed database.Feed, ctx context.Context) error {
@@ -64,14 +57,20 @@ func scrapeFeed(db *database.Queries, feed database.Feed, ctx context.Context) e
 		UpdatedAt: time.Now(),
 		ID: feed.ID,
 	})
+	if err != nil {
+		log.Printf("err marking %v feed: %v", feed.Name, err)
+	}
 
 	rssFeed, err := fetchFeed(ctx, feed.Url)
 	if err != nil {
-		return fmt.Errorf("unable to obtain rss feed: %w", err)
+		log.Printf("unable to obtain rss feed: %w", err)
 	}
 	for _, rssFeedItem := range rssFeed.Channel.Item {
 		fmt.Println(rssFeedItem.Title)
 	}
+
+	fmt.Println()
+	fmt.Printf("Feed %s collected, %v posts found\n", feed.Name, len(rssFeed.Channel.Item))
 	fmt.Println("================")
 	fmt.Println()
 	return nil
