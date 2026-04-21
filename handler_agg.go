@@ -34,7 +34,7 @@ func handlerAgg(s *state, cmd command) error {
 	for ; ; <-ticker.C {
 		err := scrapeFeeds(s)
 		if err != nil {
-			fmt.Printf("error scraping feed: %w", err)
+			fmt.Printf("error scraping feed: %v", err)
 			continue
 		}
 		}
@@ -49,10 +49,18 @@ func scrapeFeeds(s *state) error {
 	if err != nil {
 		return fmt.Errorf("error obtaining feed: %w", err)
 	}
-	fmt.Printf("Fetching feeds for: %s", feed.Name)
+	err = scrapeFeed(s.db, feed, ctx)
+	if err != nil {
+		fmt.Printf("error scraping feed: %v", err)
+	}
+	return nil
+}
+
+func scrapeFeed(db *database.Queries, feed database.Feed, ctx context.Context) error {
+	fmt.Printf("Fetching feeds for: %s\n", feed.Name)
 
 	//mark feed as updated
-	err = s.db.MarkFeedFetched(ctx, database.MarkFeedFetchedParams{
+	err := db.MarkFeedFetched(ctx, database.MarkFeedFetchedParams{
 		UpdatedAt: time.Now(),
 		ID: feed.ID,
 	})
@@ -64,5 +72,9 @@ func scrapeFeeds(s *state) error {
 	for _, rssFeedItem := range rssFeed.Channel.Item {
 		fmt.Println(rssFeedItem.Title)
 	}
+	fmt.Println("================")
+	fmt.Println()
 	return nil
-}
+	}
+		
+
