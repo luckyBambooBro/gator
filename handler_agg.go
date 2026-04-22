@@ -2,10 +2,12 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/luckyBambooBro/gator/internal/database"
 )
 
@@ -70,6 +72,32 @@ func scrapeFeed(db *database.Queries, feed database.Feed, ctx context.Context) e
 	}
 	for _, rssFeedItem := range rssFeed.Channel.Item {
 		fmt.Println(rssFeedItem.Title)
+
+		//parameters for CreatePost()
+		descr := sql.NullString{
+			String: rssFeedItem.Description,
+			Valid: rssFeedItem.Description != "",
+		}
+
+		pubDate, err := time.Parse(time.RFC1123Z, rssFeedItem.PubDate)
+		if err != nil {
+			log.Printf("unable to parse publication date for %s: %v\n", rssFeedItem.Title, err)
+			continue
+		}
+		_, err = db.CreatePost(ctx, database.CreatePostParams{
+			ID: uuid.New(),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			Title: rssFeedItem.Title,
+			Url: rssFeedItem.Link,
+			Description: descr,
+			PublishedAt: pubDate,
+			FeedID: feed.ID,
+		})
+		if err != nil {
+			log.Printf("could not create post for %s: %v\n", rssFeedItem.Title, err)
+		}
+
 	}
 
 	fmt.Println()
