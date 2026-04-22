@@ -21,10 +21,10 @@ func handlerAgg(s *state, cmd command) error {
 	interval, err := time.ParseDuration(cmd.Args[0]) //i just used cmd.Args[0] but the lesson wanted me to label it as 
 	//a variable called time_between_reqs. i dont think it matters?
 	if err != nil {
-		return fmt.Errorf("invaliud duration: %w", err)
+		return fmt.Errorf("invalid duration: %w", err)
 	}
 	if interval < requestLimit {
-		return fmt.Errorf("duration must be at least 1s to prevent server overload")
+		return fmt.Errorf("duration must be at least %v to prevent server overload", requestLimit)
 	}
 	fmt.Printf("Collecting feeds every %s\n", interval)
 	/*UP TO HERE: Use a time.Ticker to run your scrapeFeeds function once every time_between_reqs. I used a for loop 
@@ -35,7 +35,7 @@ func handlerAgg(s *state, cmd command) error {
 	for ; ; <-ticker.C {
 		scrapeFeeds(s)
 		}
-	}
+}
 
 
 func scrapeFeeds(s *state) {
@@ -44,7 +44,8 @@ func scrapeFeeds(s *state) {
 	defer cancel()
 	feed, err := s.db.GetNextFeedToFetch(ctx)
 	if err != nil {
-		log.Printf("error obtaining feed: %w", err)
+		log.Printf("error obtaining feed: %v", err)
+		return
 	}
 	scrapeFeed(s.db, feed, ctx)
 }
@@ -59,11 +60,13 @@ func scrapeFeed(db *database.Queries, feed database.Feed, ctx context.Context) e
 	})
 	if err != nil {
 		log.Printf("err marking %v feed: %v", feed.Name, err)
+		return nil
 	}
 
 	rssFeed, err := fetchFeed(ctx, feed.Url)
 	if err != nil {
-		log.Printf("unable to obtain rss feed: %w", err)
+		log.Printf("unable to obtain rss feed: %v", err)
+		return nil
 	}
 	for _, rssFeedItem := range rssFeed.Channel.Item {
 		fmt.Println(rssFeedItem.Title)

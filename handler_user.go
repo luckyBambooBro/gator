@@ -84,8 +84,11 @@ func handlerListUsers(s *state, c command) error {
 		return fmt.Errorf("error obtaining users: %w", err)
 
 	}
-
-	currentUser := s.cfg.CurrentUserName //up to here
+	if len(users) == 0 {
+		fmt.Println("No users in database")
+		return nil
+	}
+	currentUser := s.cfg.CurrentUserName 
 	for _, user := range users {
 		if user.Name == currentUser {
 			fmt.Println(user.Name, "(current)")
