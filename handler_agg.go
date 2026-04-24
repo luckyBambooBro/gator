@@ -9,7 +9,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/lib/pq"
-	"github.com/lib/pq/pqerror"
 	"github.com/luckyBambooBro/gator/internal/database"
 )
 
@@ -85,6 +84,7 @@ func scrapeFeed(db *database.Queries, feed database.Feed, ctx context.Context) e
 		pubDate, err := parseDate(rssFeedItem.PubDate)
 		if err != nil {
 			log.Printf("unable to parse rssFeed Item PubDate: %v", err)
+			continue
 		}
 		_, err = db.CreatePost(ctx, database.CreatePostParams{
 			ID: uuid.New(),
