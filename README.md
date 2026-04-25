@@ -15,7 +15,7 @@ macOS: install with brew
 Linux: download with curl  
 `curl -OL https://golang.org/dl/go1.26.2.linux-amd64.tar.gz`  
 `sudo tar -C /usr/local -xzf go1.26.2.linux-amd64.tar.gz`  
-macOS: downlonad with brew  
+macOS: download with brew  
 `brew install go`
 
 ## Install Gator
