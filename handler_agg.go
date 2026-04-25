@@ -84,7 +84,6 @@ func scrapeFeed(db *database.Queries, feed database.Feed, ctx context.Context) e
 		pubDate, err := parseDate(rssFeedItem.PubDate)
 		if err != nil {
 			log.Printf("unable to parse rssFeed Item PubDate: %v", err)
-			continue
 		}
 		_, err = db.CreatePost(ctx, database.CreatePostParams{
 			ID: uuid.New(),
@@ -97,17 +96,16 @@ func scrapeFeed(db *database.Queries, feed database.Feed, ctx context.Context) e
 			FeedID: feed.ID,
 		})
 		//check for error if url is already in table and continue loop if so
-		if pgErr, ok := err.(*pq.Error); ok {
-			if pgErr.Code == "23505" {
-				log.Printf("unable to add %v feed due to duplicate data: %v", rssFeedItem.Title, err)
-				continue
-			}
-		//can test for other types of errors here or even do a separate function with a switch to make it cleaner
-		}
+		//or return other db error
 		if err != nil {
-			log.Printf("could not create post for %s: %v\n", rssFeedItem.Title, err)
+			if pgErr, ok := err.(*pq.Error); ok {
+				if pgErr.Code == "23505" {
+					log.Printf("unable to add %v feed due to duplicate data: %v", rssFeedItem.Title, err)
+					continue
+				}
+			}
+			return fmt.Errorf("could not create post for %s: %v\n", rssFeedItem.Title, err)
 		}
-
 	}
 
 	fmt.Println()
@@ -132,5 +130,8 @@ func parseDate(rawDate string) (time.Time, error) {
 			return rssPubDateTime, err
 		}
 	}
-	return time.Time{}, fmt.Errorf("all parsing attempts failed for: %s", rawDate)
+	return time.Now().UTC(), fmt.Errorf("all parsing attempts failed for: %s", rawDate)
 }
+
+
+
