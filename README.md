@@ -22,4 +22,9 @@ macOS: download with brew
 In your command line install with go:  
 `go install github.com/luckyBambooBro/gator@latest`
 
+# Setup
+In your CLI navigate to home and create a gator config file:  
+`cd ~ && touch .gatorconfig.json`
 
+Copy and paste the following contents into .gatorconfig.json, replacing \<connection string\> with your postgres connection string.
+If you don't know your connection string click [here](github.com/luckyBambooBro/gator/connection_string.md) 
