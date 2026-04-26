@@ -27,4 +27,21 @@ In your CLI navigate to home and create a gator config file:
 `cd ~ && touch .gatorconfig.json`
 
 Copy and paste the following contents into .gatorconfig.json, replacing \<connection string\> with your postgres connection string.
-If you don't know your connection string click [here](github.com/luckyBambooBro/gator/connection_string.md) 
+
+`{"db_url":"<connection string>","current_user_name":""}`
+
+If you don't know your connection string click [here](https://github.com/luckyBambooBro/gator/blob/main/connection_string.md) 
+
+# Usage
+In your CLI run "gator" with any of the following commands:
+- login (user): logs into a registered gator user
+- register (new user): registers a new user
+- reset: resets all data in gator 
+- users: lists all users
+- agg (time interval): fetches feeds according to time interval 
+- addfeed (feedname, feedURL): adds feed into database and follows it for logged in user
+- feeds: lists all feeds followed by user
+- follow (feedURL): follows feedURL for current user 
+- following: lists all feeds followed by user
+- unfollow: unfollows feed for user
+- browse (limit): prints information on feed(s) specified by limit
