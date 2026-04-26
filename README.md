@@ -1,7 +1,7 @@
 # Gator CLI Feeds Viewer
 Welcome to Gator, our tool to view feeds via CLI
 
-# Installation
+## Installation
 You will need Postgres and Go to get started
 
 ***Postgres***
@@ -22,7 +22,7 @@ macOS: download with brew
 In your command line install with go:  
 `go install github.com/luckyBambooBro/gator@latest`
 
-# Setup
+## Setup
 In your CLI navigate to home and create a gator config file:  
 `cd ~ && touch .gatorconfig.json`
 
@@ -32,7 +32,7 @@ Copy and paste the following contents into .gatorconfig.json, replacing \<connec
 
 If you don't know your connection string click [here](https://github.com/luckyBambooBro/gator/blob/main/connection_string.md) 
 
-# Usage
+## Usage
 In your CLI run "gator" with any of the following commands:
 - login (user): logs into a registered gator user
 - register (new user): registers a new user
